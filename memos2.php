@@ -1,219 +1,680 @@
 <?php
-$pdo = new PDO(
-    "mysql:host=localhost;dbname=task2_app;charset=utf8mb4",
-    "root",
-    ""
-);
 
+include "db2.php";
+
+
+/* 保存・更新処理 */
+include "genre_update2.php";
 include "save2.php";
+include "memo_update2.php";
 
 
-/* 削除 */
-if (isset($_POST["delete_id"])) {
+/* =========================
+   ピン留めメモ一覧を取得
+========================= */
 
-    $sql = "
-        UPDATE memos
-        SET is_deleted = 1
-        WHERE id = :delete_id
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    $stmt->bindValue(
-        ":delete_id",
-        $_POST["delete_id"],
-        PDO::PARAM_INT
-    );
-
-    $stmt->execute();
-}
-
-
-/* ピン留め・解除 */
-if (isset($_POST["pinned_id"])) {
-
-    $sql = "
-        UPDATE memos
-        SET is_pinned = NOT is_pinned
-        WHERE id = :pinned_id
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    $stmt->bindValue(
-        ":pinned_id",
-        $_POST["pinned_id"],
-        PDO::PARAM_INT
-    );
-
-    $stmt->execute();
-}
-
-
-/* 詳細を保存 */
-if (isset($_POST["edit_id"])) {
-
-    $sql = "
-        UPDATE memos
-        SET detail_text = :detail_text
-        WHERE id = :edit_id
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    $stmt->bindValue(
-        ":detail_text",
-        $_POST["detail_text"]
-    );
-
-    $stmt->bindValue(
-        ":edit_id",
-        $_POST["edit_id"],
-        PDO::PARAM_INT
-    );
-
-    $stmt->execute();
-}
-
-
-/* メモを取得 */
 $sql = "
-    SELECT *
+    SELECT
+        memos.*,
+        genres.genre_name
     FROM memos
-    WHERE memo_text IS NOT NULL
-    AND is_deleted = 0
+    LEFT JOIN genres
+        ON memos.genre_id = genres.id
+    WHERE memos.memo_text IS NOT NULL
+        AND memos.is_deleted = 0
+        AND memos.is_pinned = 1
     ORDER BY
-        is_pinned DESC,
-        created_at ASC
+        memos.created_at ASC
 ";
 
-$stmt = $pdo->prepare($sql);
+$stmt = $pdo->query($sql);
 
-$stmt->execute();
+$pinnedMemos =
+    $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
 
-$memos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+/* =========================
+   通常メモ一覧を取得
+========================= */
+
+$sql = "
+    SELECT
+        memos.*,
+        genres.genre_name
+    FROM memos
+    LEFT JOIN genres
+        ON memos.genre_id = genres.id
+    WHERE memos.memo_text IS NOT NULL
+        AND memos.is_deleted = 0
+        AND memos.is_pinned = 0
+    ORDER BY
+        memos.created_at ASC
+";
+
+$stmt = $pdo->query($sql);
+
+$memos =
+    $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
+
+
+/* =========================
+   ジャンル一覧を取得
+========================= */
+
+$sql = "
+    SELECT *
+    FROM genres
+    ORDER BY id ASC
+";
+
+$stmt = $pdo->query($sql);
+
+$genres =
+    $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
+
 ?>
 
 
-<h1>メモリスト</h1>
+<!DOCTYPE html>
+<html lang="ja">
 
+<head>
 
-<?php foreach ($memos as $memo): ?>
+    <meta charset="UTF-8">
 
-    <div
-        class="memo-item"
-
-        data-id="<?php echo $memo["id"]; ?>"
-
-        data-memo-text="<?php
-            echo htmlspecialchars(
-                $memo["memo_text"],
-                ENT_QUOTES
-            );
-        ?>"
-
-        data-detail-text="<?php
-            echo htmlspecialchars(
-                $memo["detail_text"] ?? "",
-                ENT_QUOTES
-            );
-        ?>"
-
-        data-created-at="<?php
-            echo htmlspecialchars(
-                $memo["created_at"],
-                ENT_QUOTES
-            );
-        ?>"
-
-        onclick="openMemoModal(this)"
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
 
+    <title>メモ</title>
 
-        <div>
-            <?php
-            echo htmlspecialchars(
-                $memo["memo_text"]
-            );
-            ?>
+    <link
+        rel="stylesheet"
+        href="style2.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="page-container">
+
+
+    <!-- =========================
+         ヘッダー
+    ========================= -->
+
+    <header class="header">
+
+        <div class="header-top">
+
+            <h1>メモ</h1>
+
+            <button
+                type="button"
+                class="search-toggle-button"
+                onclick="toggleSearch()"
+                aria-label="検索を開閉"
+            >
+                🔍
+            </button>
+
         </div>
 
 
-        記録日時：
+        <nav class="top-tabs">
 
-        <?php
-        echo htmlspecialchars(
-            $memo["created_at"]
-        );
-        ?>
+            <a href="kioku2.php">
+                ホーム
+            </a>
+
+            <a
+                href="memos2.php"
+                class="active"
+            >
+                メモ
+            </a>
+
+            <a href="tasks2.php">
+                タスク
+            </a>
+
+            <a href="genre_manage2.php">
+                ジャンル
+            </a>
+
+        </nav>
+
+    </header>
 
 
-        <!-- 削除 -->
-        <form
-            method="post"
-            style="display: inline;"
-            onclick="event.stopPropagation();"
+
+    <main class="main-content">
+
+
+        <!-- =========================
+             検索
+        ========================= -->
+
+        <section
+            class="search-area"
+            id="search-area"
+            style="display: none;"
         >
 
-            <input
-                type="hidden"
-                name="delete_id"
-                value="<?php echo $memo["id"]; ?>"
+            <div class="section-title">
+                🔍 メモを検索
+            </div>
+
+
+            <form
+                method="get"
+                action="search2.php"
+                class="search-form"
             >
 
-            <button type="submit">
-                削除
-            </button>
-
-        </form>
-
-
-        <!-- ピン留め -->
-        <form
-            method="post"
-            style="display: inline;"
-            onclick="event.stopPropagation();"
-        >
-
-            <input
-                type="hidden"
-                name="pinned_id"
-                value="<?php echo $memo["id"]; ?>"
-            >
-
-            <button type="submit">
-
-                <?php
-
-                if ($memo["is_pinned"] == 1) {
-
-                    echo "ピン解除";
-
-                } else {
-
-                    echo "ピン留め";
-                }
-
-                ?>
-
-            </button>
-
-        </form>
+                <input
+                    type="hidden"
+                    name="type"
+                    value="memo"
+                >
 
 
-    </div>
+                <input
+                    type="text"
+                    name="keyword"
+                    placeholder="キーワードを入力"
+                >
 
-    <br>
 
-<?php endforeach; ?>
+                <select name="genre_id">
+
+                    <option value="">
+                        すべてのジャンル
+                    </option>
+
+                    <option value="none">
+                        ジャンル未選択
+                    </option>
+
+                    <?php foreach ($genres as $genre): ?>
+
+                        <option
+                            value="<?php
+                                echo $genre["id"];
+                            ?>"
+                        >
+
+                            <?php
+                            echo htmlspecialchars(
+                                $genre["genre_name"]
+                            );
+                            ?>
+
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+
+                <input
+                    type="text"
+                    name="start_date"
+                    id="search-start-date"
+                    placeholder="開始日"
+                    readonly
+                    onclick="openCalendar(this)"
+                >
+
+
+                <span>～</span>
+
+
+                <input
+                    type="text"
+                    name="end_date"
+                    id="search-end-date"
+                    placeholder="終了日"
+                    readonly
+                    onclick="openCalendar(this)"
+                >
+
+
+                <button
+                    type="submit"
+                    class="search-button"
+                >
+                    検索
+                </button>
+
+            </form>
+
+        </section>
 
 
 
-<!-- メモ詳細 -->
-<div id="memo-modal" style="display: none;">
+        <!-- =========================
+             ピン留め
+        ========================= -->
+
+        <section class="reminder-area">
+
+            <div class="reminder-header">
+
+                <span>
+                    📌 ピン留め
+                </span>
+
+            </div>
+
+
+            <div id="pinned-content">
+
+
+                <?php if (empty($pinnedMemos)): ?>
+
+
+                    <div class="reminder-row">
+
+                        <div class="reminder-empty">
+                            ピン留めされたメモはありません
+                        </div>
+
+                    </div>
+
+
+                <?php else: ?>
+
+
+                    <?php foreach ($pinnedMemos as $memo): ?>
+
+
+                        <div
+                            class="reminder-row"
+
+                            data-id="<?php
+                                echo $memo["id"];
+                            ?>"
+
+                            data-memo-text="<?php
+                                echo htmlspecialchars(
+                                    $memo["memo_text"],
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            data-detail-text="<?php
+                                echo htmlspecialchars(
+                                    $memo["detail_text"] ?? "",
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            data-created-at="<?php
+                                echo date(
+                                    "n/j H:i",
+                                    strtotime(
+                                        $memo["created_at"]
+                                    )
+                                );
+                            ?>"
+
+                            data-genre-id="<?php
+                                echo htmlspecialchars(
+                                    $memo["genre_id"] ?? "",
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            onclick="openMemoModal(this)"
+                        >
+
+
+                            <div class="item-body">
+
+
+                                <div class="item-content">
+
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $memo["memo_text"]
+                                    );
+                                    ?>
+
+                                </div>
+
+
+                                <div class="item-meta">
+
+
+                                    <span class="memo-label">
+                                        メモ
+                                    </span>
+
+
+                                    <?php if (!empty($memo["genre_name"])): ?>
+
+                                        <span class="genre-label">
+
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $memo["genre_name"]
+                                            );
+                                            ?>
+
+                                        </span>
+
+                                    <?php endif; ?>
+
+
+                                    <span class="pin-label">
+                                        📌 ピン留め
+                                    </span>
+
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="item-right">
+
+
+                                <span class="item-date">
+
+                                    <?php
+                                    echo date(
+                                        "n/j H:i",
+                                        strtotime(
+                                            $memo["created_at"]
+                                        )
+                                    );
+                                    ?>
+
+                                </span>
+
+
+                                <form
+                                    method="post"
+                                    onclick="event.stopPropagation();"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="pinned_id"
+                                        value="<?php
+                                            echo $memo["id"];
+                                        ?>"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="small-action"
+                                    >
+                                        ピン解除
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="post"
+                                    onclick="event.stopPropagation();"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="delete_id"
+                                        value="<?php
+                                            echo $memo["id"];
+                                        ?>"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="small-action"
+                                    >
+                                        削除
+                                    </button>
+
+                                </form>
+
+
+                            </div>
+
+                        </div>
+
+
+                    <?php endforeach; ?>
+
+
+                <?php endif; ?>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             メモ一覧
+        ========================= -->
+
+        <section class="records-area">
+
+
+            <div class="section-title">
+                メモ一覧
+            </div>
+
+
+            <?php if (empty($memos)): ?>
+
+                <p class="empty-message">
+                    メモはありません。
+                </p>
+
+            <?php endif; ?>
+
+
+            <?php foreach ($memos as $memo): ?>
+
+
+                <div
+                    class="item memo-item"
+
+                    data-id="<?php
+                        echo $memo["id"];
+                    ?>"
+
+                    data-memo-text="<?php
+                        echo htmlspecialchars(
+                            $memo["memo_text"],
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    data-detail-text="<?php
+                        echo htmlspecialchars(
+                            $memo["detail_text"] ?? "",
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    data-created-at="<?php
+                        echo date(
+                            "n/j H:i",
+                            strtotime(
+                                $memo["created_at"]
+                            )
+                        );
+                    ?>"
+
+                    data-genre-id="<?php
+                        echo htmlspecialchars(
+                            $memo["genre_id"] ?? "",
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    onclick="openMemoModal(this)"
+                >
+
+
+                    <div class="item-body">
+
+
+                        <div class="item-content">
+
+                            <?php
+                            echo htmlspecialchars(
+                                $memo["memo_text"]
+                            );
+                            ?>
+
+                        </div>
+
+
+                        <div class="item-meta">
+
+
+                            <span class="memo-label">
+                                メモ
+                            </span>
+
+
+                            <?php if (!empty($memo["genre_name"])): ?>
+
+                                <span class="genre-label">
+
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $memo["genre_name"]
+                                    );
+                                    ?>
+
+                                </span>
+
+                            <?php endif; ?>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="item-right">
+
+
+                        <span class="item-date">
+
+                            <?php
+                            echo date(
+                                "n/j H:i",
+                                strtotime(
+                                    $memo["created_at"]
+                                )
+                            );
+                            ?>
+
+                        </span>
+
+
+                        <form
+                            method="post"
+                            onclick="event.stopPropagation();"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="pinned_id"
+                                value="<?php
+                                    echo $memo["id"];
+                                ?>"
+                            >
+
+                            <button
+                                type="submit"
+                                class="small-action"
+                            >
+                                ピン
+                            </button>
+
+                        </form>
+
+
+                        <form
+                            method="post"
+                            onclick="event.stopPropagation();"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="delete_id"
+                                value="<?php
+                                    echo $memo["id"];
+                                ?>"
+                            >
+
+                            <button
+                                type="submit"
+                                class="small-action"
+                            >
+                                削除
+                            </button>
+
+                        </form>
+
+
+                    </div>
+
+                </div>
+
+
+            <?php endforeach; ?>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <?php include "calendar2.php"; ?>
+
+    <?php include "input_form2.php"; ?>
+
+
+</div>
+
+
+
+<!-- =========================
+     メモ詳細
+========================= -->
+
+<div
+    id="memo-modal"
+    class="detail-modal"
+    style="display: none;"
+>
+
 
     <button
         type="button"
+        class="close-button"
         onclick="closeMemoModal()"
     >
         ×
@@ -235,14 +696,16 @@ $memos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <form method="post">
 
+
         <input
             type="hidden"
-            name="edit_id"
+            name="memo_edit_id"
             id="modal-edit-id"
         >
 
 
         <p>詳細</p>
+
 
         <textarea
             name="detail_text"
@@ -251,66 +714,173 @@ $memos = $stmt->fetchAll(PDO::FETCH_ASSOC);
         ></textarea>
 
 
+        <p>ジャンル</p>
+
+
+        <select
+            name="genre_id"
+            id="modal-genre-id"
+        >
+
+            <option value="">
+                ジャンルなし
+            </option>
+
+
+            <?php foreach ($genres as $genre): ?>
+
+                <option
+                    value="<?php
+                        echo $genre["id"];
+                    ?>"
+                >
+
+                    <?php
+                    echo htmlspecialchars(
+                        $genre["genre_name"]
+                    );
+                    ?>
+
+                </option>
+
+            <?php endforeach; ?>
+
+
+        </select>
+
+
+        <p>新しいジャンル</p>
+
+
+        <input
+            type="text"
+            name="new_genre_name"
+            id="modal-new-genre-name"
+            placeholder="新しく作る場合のみ入力"
+        >
+
+
         <br><br>
 
 
-        <button type="submit">
+        <button
+            type="submit"
+            class="modal-save-button"
+        >
             保存
         </button>
 
+
     </form>
+
 
 </div>
 
 
 
-<nav>
-    <a href="zen2.php">全情報</a>
-    <a href="memos2.php">メモ</a>
-    <a href="tasks2.php">タスク</a>
-    <a href="kioku2.php">リマインド</a>
-</nav>
-
-
-<?php include "input_form2.php"; ?>
-
-
-
 <script>
+
+
+/* =========================
+   検索開閉
+========================= */
+
+function toggleSearch() {
+
+    const searchArea =
+        document.getElementById(
+            "search-area"
+        );
+
+    const isHidden =
+        window.getComputedStyle(
+            searchArea
+        ).display === "none";
+
+    searchArea.style.display =
+        isHidden
+        ? "block"
+        : "none";
+}
+
+
+
+/* =========================
+   メモ詳細
+========================= */
 
 function openMemoModal(memo) {
 
     document
-        .getElementById("modal-edit-id")
-        .value = memo.dataset.id;
+        .getElementById(
+            "modal-edit-id"
+        )
+        .value =
+            memo.dataset.id;
 
 
     document
-        .getElementById("modal-memo-text")
-        .textContent = memo.dataset.memoText;
+        .getElementById(
+            "modal-memo-text"
+        )
+        .textContent =
+            memo.dataset.memoText;
 
 
     document
-        .getElementById("modal-created-at")
-        .textContent = memo.dataset.createdAt;
+        .getElementById(
+            "modal-created-at"
+        )
+        .textContent =
+            memo.dataset.createdAt;
 
 
     document
-        .getElementById("modal-detail-text")
-        .value = memo.dataset.detailText;
+        .getElementById(
+            "modal-detail-text"
+        )
+        .value =
+            memo.dataset.detailText;
 
 
     document
-        .getElementById("memo-modal")
-        .style.display = "block";
+        .getElementById(
+            "modal-genre-id"
+        )
+        .value =
+            memo.dataset.genreId;
+
+
+    document
+        .getElementById(
+            "modal-new-genre-name"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "memo-modal"
+        )
+        .style.display =
+            "block";
 }
+
 
 
 function closeMemoModal() {
 
     document
-        .getElementById("memo-modal")
-        .style.display = "none";
+        .getElementById(
+            "memo-modal"
+        )
+        .style.display =
+            "none";
 }
 
+
 </script>
+
+
+</body>
+</html>

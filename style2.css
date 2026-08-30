@@ -1,0 +1,1335 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #e5f1f7;
+    color: #222;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+
+/* =========================
+   ページ全体
+========================= */
+
+.page-container {
+    width: 100%;
+    max-width: 760px;
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    padding-top: 40px;
+    padding-bottom: 66px;
+
+    background: #fff;
+}
+
+
+/* =========================
+   ヘッダー
+   常に画面上部に固定
+========================= */
+
+.header {
+    background: #d3ebf7;
+    border-bottom: 1px solid #bdd9e7;
+}
+
+.header-top {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    height: 48px;
+
+    padding: 0 22px;
+}
+
+.header h1 {
+    margin: 0;
+
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.search-toggle-button {
+    position: fixed;
+    top: 2px;
+    right: max(14px, calc((100vw - 760px) / 2 + 14px));
+    z-index: 3100;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: 0;
+    background: #d3ebf7;
+
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   上部タブ
+========================= */
+
+.top-tabs {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 3000;
+
+    display: flex;
+
+    width: 100%;
+    max-width: 760px;
+
+    margin: 0;
+    padding: 0 56px 0 22px;
+
+    transform: translateX(-50%);
+
+    background: #d3ebf7;
+    border: 0;
+    border-bottom: 1px solid #bdd9e7;
+}
+
+.top-tabs a {
+    flex: 1;
+
+    padding: 8px 0 9px;
+
+    color: #3f3f3f;
+
+    text-align: center;
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+.top-tabs a.active {
+    color: #168be0;
+
+    font-weight: 600;
+
+    border-bottom: 2px solid #168be0;
+}
+
+
+/* =========================
+   メイン
+========================= */
+
+.main-content {
+    padding: 0 22px 18px;
+}
+
+.section-title {
+    margin-bottom: 8px;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* =========================
+   検索
+========================= */
+
+.search-area {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    z-index: 2990;
+
+    width: 100%;
+    max-width: 760px;
+
+    margin: 0;
+    padding: 10px 22px;
+
+    transform: translateX(-50%);
+
+    background: #eef6f9;
+
+    border-bottom: 1px solid #dceaf1;
+}
+
+.search-area .section-title {
+    margin: 0 0 8px;
+
+    font-size: 14px;
+}
+
+.search-form {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+.search-form input,
+.search-form select {
+    height: 32px;
+
+    min-width: 0;
+
+    padding: 4px 7px;
+
+    border: 1px solid #d7e0e5;
+    border-radius: 6px;
+
+    background: #fff;
+
+    font-size: 13px;
+}
+
+.search-form input[type="text"] {
+    flex: 1.4;
+}
+
+.search-form select {
+    flex: 1;
+}
+
+.search-form input[type="date"] {
+    flex: 1;
+}
+
+.search-button {
+    height: 32px;
+
+    padding: 0 11px;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: #168be0;
+
+    color: #fff;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   リマインド
+========================= */
+
+.reminder-area {
+    position: sticky;
+    top: 40px;
+    z-index: 2900;
+
+    margin: 0 -22px 14px;
+
+    overflow: hidden;
+
+    border: 0;
+    border-bottom: 1px solid #d8eaf4;
+    border-radius: 0;
+
+    background: #fff;
+}
+
+.reminder-header {
+    display: flex;
+
+    width: 100%;
+    height: 40px;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 22px;
+
+    border: 0;
+
+    background: #dff2fa;
+
+    color: #12628f;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.reminder-row {
+    display: flex;
+
+    min-height: 48px;
+
+    align-items: center;
+
+    padding: 6px 22px;
+
+    border-top: 1px solid #dce5e9;
+}
+
+.reminder-period {
+    width: 125px;
+
+    flex-shrink: 0;
+
+    color: #168be0;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.reminder-count {
+    font-size: 11px;
+
+    font-weight: 400;
+}
+
+.reminder-record {
+    flex: 1;
+
+    min-width: 0;
+
+    cursor: pointer;
+}
+
+.reminder-main {
+    overflow: hidden;
+
+    color: #222;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+.reminder-extra {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 2px;
+
+    color: #555;
+
+    font-size: 11px;
+}
+
+.reminder-empty {
+    color: #666;
+
+    font-size: 12px;
+}
+
+#reminder-content.compact .reminder-row {
+    min-height: 32px;
+
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
+#reminder-content.compact .reminder-period {
+    width: 110px;
+}
+
+#reminder-content.compact .reminder-extra {
+    display: none;
+}
+
+#reminder-content.compact .reminder-main {
+    font-size: 13px;
+}
+
+
+/* =========================
+   記録一覧
+========================= */
+
+.records-area {
+    overflow: hidden;
+
+    margin-top: 14px;
+
+    border: 1px solid #ccdce4;
+    border-radius: 9px;
+
+    background: #fff;
+}
+
+.records-area .section-title {
+    margin: 0;
+
+    padding: 10px 12px;
+
+    border-bottom: 1px solid #d8e2e7;
+}
+
+.item {
+    display: flex;
+
+    min-height: 58px;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 8px 12px;
+
+    border-bottom: 1px solid #d8e2e7;
+
+    cursor: pointer;
+}
+
+.item:last-child {
+    border-bottom: 0;
+}
+
+.item:hover {
+    background: #f8fcfe;
+}
+
+.item-body {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.item-content {
+    overflow: hidden;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+.item-meta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 3px;
+
+    color: #555;
+
+    font-size: 11px;
+}
+
+.memo-label,
+.task-label,
+.genre-label {
+    display: inline-block;
+
+    padding: 1px 6px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+}
+
+.memo-label {
+    background: #d5edfa;
+
+    color: #0879bc;
+}
+
+.task-label {
+    background: #d8f1e7;
+
+    color: #087b52;
+}
+
+.genre-label {
+    background: #e7e7e7;
+
+    color: #4d4d4d;
+}
+
+.due-date {
+    color: #1f4e79;
+
+    font-weight: 600;
+}
+
+.item-right {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-left: 12px;
+}
+
+.item-date {
+    color: #555;
+
+    font-size: 11px;
+}
+
+.small-action {
+    padding: 3px 6px;
+
+    border: 1px solid #c9d5db;
+    border-radius: 5px;
+
+    background: #fff;
+
+    color: #4f4f4f;
+
+    font-size: 11px;
+
+    cursor: pointer;
+}
+
+.empty-message {
+    padding: 12px;
+
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   共通入力フォーム
+========================= */
+
+.input-area {
+    position: fixed;
+
+    z-index: 100;
+
+    bottom: 0;
+    left: 50%;
+
+    display: flex;
+
+    width: 100%;
+    max-width: 760px;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 8px 12px;
+
+    transform: translateX(-50%);
+
+    border-top: 1px solid #cbdce4;
+
+    background: #eef6f9;
+}
+
+
+/* ジャンル */
+
+.input-area select {
+    width: 110px;
+    height: 38px;
+
+    padding: 0 7px;
+
+    border: 1px solid #c3d1d8;
+    border-radius: 7px;
+
+    background: #fff;
+
+    font-size: 12px;
+}
+
+
+/* 内容入力 */
+
+.input-area .main-input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 38px;
+    min-height: 38px;
+    max-height: 90px;
+
+    margin: 0;
+
+    padding: 8px 12px;
+
+    resize: none;
+
+    border: 1px solid #c3d1d8;
+    border-radius: 19px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    font-size: 14px;
+
+    line-height: 20px;
+}
+
+.input-area .main-input:focus {
+    border-color: #9bcfed;
+}
+
+
+/* =========================
+   メモ・タスクボタン
+========================= */
+
+.input-area .memo-button,
+.input-area .task-button,
+.input-area .task-submit-button {
+    flex-shrink: 0;
+
+    height: 36px;
+
+    padding: 0 12px;
+
+    border: none;
+    border-radius: 7px;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+.input-area .memo-button {
+    background: #168be0;
+}
+
+.input-area .task-button {
+    background: #18a36f;
+}
+
+
+/* =========================
+   タスク期限
+========================= */
+
+.task-area {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.task-area[hidden] {
+    display: none;
+}
+
+.task-area input[type="date"] {
+    height: 36px;
+
+    padding: 0 7px;
+
+    border: 1px solid #c3d1d8;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    font-size: 12px;
+}
+
+.task-submit-button {
+    background: #18a36f;
+}
+
+
+/* =========================
+   詳細モーダル
+========================= */
+
+.detail-modal {
+    position: fixed;
+
+    z-index: 5000;
+
+    top: 50%;
+    left: 50%;
+
+    width: calc(100% - 32px);
+    max-width: 400px;
+    max-height: 85vh;
+
+    padding: 18px;
+
+    overflow-y: auto;
+
+    transform: translate(-50%, -50%);
+
+    border: 1px solid #dbe7ed;
+    border-radius: 10px;
+
+    background: #fff;
+
+    box-shadow:
+        0 8px 30px
+        rgba(0,0,0,.18);
+}
+
+.detail-modal h2 {
+    margin: 0 0 15px;
+
+    font-size: 17px;
+}
+
+.detail-modal p {
+    margin: 12px 0 4px;
+
+    color: #666;
+
+    font-size: 12px;
+}
+
+.detail-modal textarea,
+.detail-modal input,
+.detail-modal select {
+    width: 100%;
+
+    padding: 7px;
+
+    border: 1px solid #d7e0e5;
+    border-radius: 6px;
+
+    font-size: 13px;
+}
+
+.detail-modal textarea {
+    min-height: 80px;
+}
+
+.close-button {
+    float: right;
+
+    border: 0;
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   ジャンル管理
+========================= */
+
+.genre-manage-item {
+    display: flex;
+
+    align-items: center;
+
+    width: 100%;
+
+    padding: 11px 14px;
+
+    border-bottom: 1px solid #d8e2e7;
+
+    background: #ffffff;
+}
+
+.genre-rename-form {
+    display: flex;
+
+    flex: 1;
+
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 8px;
+}
+
+.genre-rename-form input[type="text"] {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 36px;
+
+    padding: 0 10px;
+
+    border: 1px solid #d9e1e5;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    font-size: 14px;
+}
+
+.genre-rename-form input[type="text"]:focus {
+    border-color: #8bc8e8;
+}
+
+.genre-change-button {
+    flex-shrink: 0;
+
+    height: 34px;
+
+    padding: 0 11px;
+
+    border: 1px solid #c9e3f2;
+    border-radius: 6px;
+
+    background: #f3faff;
+
+    color: #168bd2;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.genre-delete-form {
+    flex-shrink: 0;
+
+    margin-left: 6px;
+}
+
+.genre-delete-button {
+    height: 34px;
+
+    padding: 0 11px;
+
+    border: 1px solid #e1e4e6;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #777777;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.genre-change-button:hover {
+    background: #e7f6ff;
+}
+
+.genre-delete-button:hover {
+    background: #f5f5f5;
+}
+
+
+/* =========================
+   検索条件クリア
+========================= */
+
+.search-clear-row {
+    margin-top: 8px;
+}
+
+.search-clear-link {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border: 1px solid #d7e0e5;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #666666;
+
+    text-decoration: none;
+
+    font-size: 12px;
+}
+
+.search-clear-link:hover {
+    background: #f3f8fa;
+}
+
+
+/* =========================
+   詳細モーダル 保存ボタン
+========================= */
+
+.modal-save-button {
+    height: 36px;
+
+    padding: 0 16px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #168be0;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+.modal-save-button:hover {
+    background: #0f7bc8;
+}
+
+
+/* =========================
+   自作カレンダー
+========================= */
+
+.calendar-modal {
+    position: fixed;
+
+    z-index: 6000;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(
+            0,
+            0,
+            0,
+            0.25
+        );
+}
+
+.calendar-box {
+    width: 100%;
+    max-width: 360px;
+
+    padding: 18px;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 30px
+        rgba(
+            0,
+            0,
+            0,
+            0.15
+        );
+}
+
+.calendar-top {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 15px;
+}
+
+.calendar-title {
+    color: #222222;
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.calendar-arrow {
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f2f8fb;
+
+    color: #168bd2;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+.calendar-week {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    margin-bottom: 5px;
+
+    text-align: center;
+
+    color: #777777;
+
+    font-size: 11px;
+}
+
+.calendar-days {
+    display: grid;
+
+    grid-template-columns:
+        repeat(7, 1fr);
+
+    gap: 5px;
+}
+
+.calendar-empty {
+    height: 38px;
+}
+
+.calendar-day {
+    height: 38px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: #333333;
+
+    font-size: 13px;
+
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background: #eef8fd;
+}
+
+.calendar-day.today {
+    border: 1px solid #168bd2;
+
+    color: #168bd2;
+}
+
+.calendar-day.selected {
+    border: none;
+
+    background: #168bd2;
+
+    color: #ffffff;
+}
+
+.calendar-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    margin-top: 18px;
+}
+
+.calendar-sub-button {
+    height: 34px;
+
+    padding: 0 10px;
+
+    border: 1px solid #dbe3e7;
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #666666;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+.calendar-confirm-button {
+    height: 34px;
+
+    padding: 0 14px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: #168be0;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   期限切れ
+========================= */
+
+.overdue-label {
+    margin-left: 6px;
+
+    color: #b42318 !important;
+
+    font-weight: 700;
+}
+
+
+/* =========================
+   スマホ
+========================= */
+
+@media screen and (max-width: 600px) {
+
+    .header-top,
+    .top-tabs {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .main-content {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .search-area,
+    .reminder-area {
+        margin-left: -14px;
+        margin-right: -14px;
+    }
+
+    .search-area,
+    .reminder-header,
+    .reminder-row {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .search-form {
+        flex-wrap: wrap;
+    }
+
+    .search-form input[type="text"] {
+        flex-basis: 55%;
+    }
+
+    .search-form select {
+        flex-basis: 35%;
+    }
+
+    .search-form input[type="date"] {
+        flex: 1;
+    }
+
+    .reminder-period {
+        width: 105px;
+    }
+
+    #reminder-content.compact
+    .reminder-period {
+        width: 95px;
+    }
+
+    .input-area {
+        gap: 5px;
+
+        padding: 7px;
+    }
+
+    .input-area select {
+        width: 82px;
+    }
+
+    .input-area .main-input {
+        height: 36px;
+
+        min-height: 36px;
+
+        padding: 7px 10px;
+
+        font-size: 14px;
+    }
+
+    .input-area .memo-button,
+    .input-area .task-button,
+    .input-area .task-submit-button {
+        height: 34px;
+
+        padding: 0 9px;
+
+        font-size: 12px;
+    }
+
+    .task-area input[type="date"] {
+        width: 125px;
+
+        height: 34px;
+    }
+
+    .genre-manage-item {
+        padding: 10px 8px;
+    }
+
+    .genre-rename-form {
+        gap: 5px;
+    }
+
+    .genre-rename-form
+    input[type="text"] {
+        height: 34px;
+
+        padding: 0 8px;
+
+        font-size: 13px;
+    }
+
+    .genre-change-button,
+    .genre-delete-button {
+        height: 32px;
+
+        padding: 0 8px;
+
+        font-size: 11px;
+    }
+
+    .genre-delete-form {
+        margin-left: 4px;
+    }
+
+    .calendar-box {
+        max-width: 330px;
+
+        padding: 15px;
+    }
+
+    .calendar-day {
+        height: 36px;
+    }
+}
+
+/* =========================
+   スマホ下部入力欄の調整
+   ・通常時は1行
+   ・新規ジャンル入力時だけ2段
+========================= */
+
+@media screen and (max-width: 600px) {
+
+    .input-area {
+        gap: 5px;
+        padding: 7px;
+        flex-wrap: nowrap;
+    }
+
+    .input-area select {
+        width: 86px;
+        flex: 0 0 86px;
+    }
+
+    .input-area .main-input {
+        flex: 1 1 0;
+        min-width: 0;
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    #new-genre-name {
+        min-width: 0;
+        height: 34px;
+        padding: 0 8px;
+        border: 1px solid #c3d1d8;
+        border-radius: 7px;
+        background: #fff;
+        font-size: 12px;
+    }
+
+    .input-area .memo-button,
+    .input-area .task-button,
+    .input-area .task-submit-button {
+        flex: 0 0 auto;
+        height: 34px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
+
+    /* 「＋新規ジャンル」を選んだときだけ2段にする */
+    .input-area:has(#new-genre-name[style*="display: block"]) {
+        flex-wrap: wrap;
+    }
+
+    .input-area:has(#new-genre-name[style*="display: block"]) > select {
+        width: 108px;
+        flex: 0 0 108px;
+    }
+
+    .input-area:has(#new-genre-name[style*="display: block"]) #new-genre-name {
+        flex: 1 1 0;
+        width: auto;
+    }
+
+    .input-area:has(#new-genre-name[style*="display: block"]) .main-input {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+/* =========================
+   スマホ：上部固定タブ＋虫メガネ＋検索欄
+========================= */
+
+@media screen and (max-width: 600px) {
+
+    .top-tabs {
+        padding-left: 14px;
+        padding-right: 50px;
+    }
+
+    .search-toggle-button {
+        top: 2px;
+        right: 8px;
+    }
+
+    .search-area {
+        top: 40px;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+}

@@ -1,211 +1,720 @@
 <?php
-$pdo = new PDO(
-    "mysql:host=localhost;dbname=task2_app;charset=utf8mb4",
-    "root",
-    ""
-);
+
+include "db2.php";
+
+
+/* 保存・更新処理 */
+include "genre_update2.php";
 
 include "save2.php";
 
-
-/* タスクを完了する */
-if (isset($_POST["complete_id"])) {
-
-    $sql = "
-        UPDATE tasks
-        SET is_completed = 1
-        WHERE id = :complete_id
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    $stmt->bindValue(
-        ":complete_id",
-        $_POST["complete_id"],
-        PDO::PARAM_INT
-    );
-
-    $stmt->execute();
-}
+include "task_update2.php";
 
 
-/* 詳細画面で変更した内容を保存する */
-if (isset($_POST["edit_id"])) {
+/* =========================
+   今日の日付
+========================= */
 
-    $sql = "
-        UPDATE tasks
-        SET
-            detail_text = :detail_text,
-            due_date = :due_date
-        WHERE id = :edit_id
-    ";
-
-    $stmt = $pdo->prepare($sql);
-
-    $stmt->bindValue(
-        ":detail_text",
-        $_POST["detail_text"]
-    );
+$today =
+    date("Y-m-d");
 
 
-    if ($_POST["due_date"] === "") {
+/* =========================
+   今日が期限のタスクを取得
+========================= */
 
-        $stmt->bindValue(
-            ":due_date",
-            null,
-            PDO::PARAM_NULL
-        );
-
-    } else {
-
-        $stmt->bindValue(
-            ":due_date",
-            $_POST["due_date"]
-        );
-    }
-
-
-    $stmt->bindValue(
-        ":edit_id",
-        $_POST["edit_id"],
-        PDO::PARAM_INT
-    );
-
-    $stmt->execute();
-}
-
-
-/* 未完了のタスクを取得する */
 $sql = "
-    SELECT *
+    SELECT
+        tasks.*,
+        genres.genre_name
     FROM tasks
-    WHERE is_completed = 0
+    LEFT JOIN genres
+        ON tasks.genre_id = genres.id
+    WHERE tasks.is_completed = 0
+        AND tasks.due_date = :today
     ORDER BY
-        due_date IS NULL DESC,
-        due_date ASC,
-        created_at DESC
+        tasks.created_at ASC
 ";
 
-$stmt = $pdo->query($sql);
 
-$tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt =
+    $pdo->prepare($sql);
+
+
+$stmt->bindValue(
+    ":today",
+    $today,
+    PDO::PARAM_STR
+);
+
+
+$stmt->execute();
+
+
+$todayTasks =
+    $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
+
+
+/* =========================
+   今日以外の未完了タスクを取得
+========================= */
+
+$sql = "
+    SELECT
+        tasks.*,
+        genres.genre_name
+    FROM tasks
+    LEFT JOIN genres
+        ON tasks.genre_id = genres.id
+    WHERE tasks.is_completed = 0
+        AND (
+            tasks.due_date IS NULL
+            OR tasks.due_date <> :today
+        )
+    ORDER BY
+        tasks.due_date IS NULL DESC,
+        tasks.due_date ASC,
+        tasks.created_at DESC
+";
+
+
+$stmt =
+    $pdo->prepare($sql);
+
+
+$stmt->bindValue(
+    ":today",
+    $today,
+    PDO::PARAM_STR
+);
+
+
+$stmt->execute();
+
+
+$tasks =
+    $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
+
+
+/* =========================
+   ジャンル一覧を取得
+========================= */
+
+$sql = "
+    SELECT *
+    FROM genres
+    ORDER BY id ASC
+";
+
+
+$stmt =
+    $pdo->query($sql);
+
+
+$genres =
+    $stmt->fetchAll(
+        PDO::FETCH_ASSOC
+    );
+
 ?>
 
 
-<h2>タスクリスト</h2>
+<!DOCTYPE html>
+<html lang="ja">
 
+<head>
 
-<?php foreach ($tasks as $task): ?>
+    <meta charset="UTF-8">
 
-    <div
-        class="task-item"
-
-        data-id="<?php echo $task["id"]; ?>"
-
-        data-task-text="<?php
-            echo htmlspecialchars(
-                $task["task_text"],
-                ENT_QUOTES
-            );
-        ?>"
-
-        data-detail-text="<?php
-            echo htmlspecialchars(
-                $task["detail_text"] ?? "",
-                ENT_QUOTES
-            );
-        ?>"
-
-        data-created-at="<?php
-            echo date(
-                "n/j H:i",
-                strtotime($task["created_at"])
-            );
-        ?>"
-
-        data-due-date="<?php
-            echo htmlspecialchars(
-                $task["due_date"] ?? "",
-                ENT_QUOTES
-            );
-        ?>"
-
-        onclick="openTaskModal(this)"
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
     >
 
+    <title>タスク</title>
 
-        <div>
-            <span>
-                <?php
-                echo htmlspecialchars(
-                    $task["task_text"]
-                );
-                ?>
-            </span>
+    <link
+        rel="stylesheet"
+        href="style2.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="page-container">
+
+
+    <header class="header">
+
+        <div class="header-top">
+
+            <h1>タスク</h1>
+
+            <button
+                type="button"
+                class="search-toggle-button"
+                onclick="toggleSearch()"
+                aria-label="検索を開閉"
+            >
+                🔍
+            </button>
+
         </div>
 
 
+        <nav class="top-tabs">
+
+            <a href="kioku2.php">
+                ホーム
+            </a>
+
+            <a href="memos2.php">
+                メモ
+            </a>
+
+            <a
+                href="tasks2.php"
+                class="active"
+            >
+                タスク
+            </a>
+
+            <a href="genre_manage2.php">
+                ジャンル
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main class="main-content">
+
+
+        <!-- =========================
+             検索
+        ========================= -->
+
+        <section
+            class="search-area"
+            id="search-area"
+            style="display: none;"
+        >
+
+            <div class="section-title">
+                🔍 タスクを検索
+            </div>
+
+
+            <form
+                method="get"
+                action="search2.php"
+                class="search-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="type"
+                    value="task"
+                >
+
+
+                <input
+                    type="text"
+                    name="keyword"
+                    placeholder="キーワードを入力"
+                >
+
+
+                <select name="genre_id">
+
+                    <option value="">
+                        すべてのジャンル
+                    </option>
+
+                    <option value="none">
+                        ジャンル未選択
+                    </option>
+
+                    <?php foreach ($genres as $genre): ?>
+
+                        <option
+                            value="<?php
+                                echo $genre["id"];
+                            ?>"
+                        >
+
+                            <?php
+                            echo htmlspecialchars(
+                                $genre["genre_name"]
+                            );
+                            ?>
+
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+
+                <input
+                    type="text"
+                    name="start_date"
+                    id="search-start-date"
+                    placeholder="開始日"
+                    readonly
+                    onclick="openCalendar(this)"
+                >
+
+
+                <span>～</span>
+
+
+                <input
+                    type="text"
+                    name="end_date"
+                    id="search-end-date"
+                    placeholder="終了日"
+                    readonly
+                    onclick="openCalendar(this)"
+                >
+
+
+                <button
+                    type="submit"
+                    class="search-button"
+                >
+                    検索
+                </button>
+
+            </form>
+
+        </section>
+
+
+
+        <!-- =========================
+             今日のタスク
+        ========================= -->
+
+        <section class="reminder-area">
+
+            <div class="reminder-header">
+
+                <span>
+                    📅 今日のタスク
+                </span>
+
+            </div>
+
+
+            <div id="today-task-content">
+
+
+                <?php if (empty($todayTasks)): ?>
+
+
+                    <div class="reminder-row">
+
+                        <div class="reminder-empty">
+                            今日が期限のタスクはありません
+                        </div>
+
+                    </div>
+
+
+                <?php else: ?>
+
+
+                    <?php foreach ($todayTasks as $task): ?>
+
+
+                        <div
+                            class="reminder-row"
+
+                            data-id="<?php
+                                echo $task["id"];
+                            ?>"
+
+                            data-task-text="<?php
+                                echo htmlspecialchars(
+                                    $task["task_text"],
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            data-detail-text="<?php
+                                echo htmlspecialchars(
+                                    $task["detail_text"] ?? "",
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            data-created-at="<?php
+                                echo date(
+                                    "n/j H:i",
+                                    strtotime(
+                                        $task["created_at"]
+                                    )
+                                );
+                            ?>"
+
+                            data-due-date="<?php
+                                echo htmlspecialchars(
+                                    $task["due_date"] ?? "",
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            data-genre-id="<?php
+                                echo htmlspecialchars(
+                                    $task["genre_id"] ?? "",
+                                    ENT_QUOTES
+                                );
+                            ?>"
+
+                            onclick="openTaskModal(this)"
+                        >
+
+
+                            <div class="item-body">
+
+
+                                <div class="item-content">
+
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $task["task_text"]
+                                    );
+                                    ?>
+
+                                </div>
+
+
+                                <div class="item-meta">
+
+
+                                    <span class="task-label">
+                                        タスク
+                                    </span>
+
+
+                                    <?php if (!empty($task["genre_name"])): ?>
+
+                                        <span class="genre-label">
+
+                                            <?php
+                                            echo htmlspecialchars(
+                                                $task["genre_name"]
+                                            );
+                                            ?>
+
+                                        </span>
+
+                                    <?php endif; ?>
+
+
+                                    <span class="due-date">
+                                        期限：今日
+                                    </span>
+
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="item-right">
+
+
+                                <span class="item-date">
+
+                                    <?php
+                                    echo date(
+                                        "n/j H:i",
+                                        strtotime(
+                                            $task["created_at"]
+                                        )
+                                    );
+                                    ?>
+
+                                </span>
+
+
+                                <form
+                                    method="post"
+                                    onclick="event.stopPropagation();"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="complete_id"
+                                        value="<?php
+                                            echo $task["id"];
+                                        ?>"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="small-action complete-action"
+                                    >
+                                        完了
+                                    </button>
+
+                                </form>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    <?php endforeach; ?>
+
+
+                <?php endif; ?>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             通常タスク一覧
+        ========================= -->
+
+        <section class="records-area">
+
+            <div class="section-title">
+                タスク一覧
+            </div>
+
+
+            <?php if (empty($tasks)): ?>
+
+                <p class="empty-message">
+                    その他の未完了タスクはありません。
+                </p>
+
+            <?php endif; ?>
+
+
+            <?php foreach ($tasks as $task): ?>
+
+
+                <div
+                    class="item task-item"
+
+                    data-id="<?php
+                        echo $task["id"];
+                    ?>"
+
+                    data-task-text="<?php
+                        echo htmlspecialchars(
+                            $task["task_text"],
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    data-detail-text="<?php
+                        echo htmlspecialchars(
+                            $task["detail_text"] ?? "",
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    data-created-at="<?php
+                        echo date(
+                            "n/j H:i",
+                            strtotime(
+                                $task["created_at"]
+                            )
+                        );
+                    ?>"
+
+                    data-due-date="<?php
+                        echo htmlspecialchars(
+                            $task["due_date"] ?? "",
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    data-genre-id="<?php
+                        echo htmlspecialchars(
+                            $task["genre_id"] ?? "",
+                            ENT_QUOTES
+                        );
+                    ?>"
+
+                    onclick="openTaskModal(this)"
+                >
+
+
+                    <div class="item-body">
+
+
+                        <div class="item-content">
+
+                            <?php
+                            echo htmlspecialchars(
+                                $task["task_text"]
+                            );
+                            ?>
+
+                        </div>
+
+
+                        <div class="item-meta">
+
+
+                            <span class="task-label">
+                                タスク
+                            </span>
+
+
+                            <?php if (!empty($task["genre_name"])): ?>
+
+                                <span class="genre-label">
+
+                                    <?php
+                                    echo htmlspecialchars(
+                                        $task["genre_name"]
+                                    );
+                                    ?>
+
+                                </span>
+
+                            <?php endif; ?>
+
+
+                           <span class="due-date">
+
+    <?php if (!empty($task["due_date"])): ?>
+
+        期限：
+
         <?php
         echo date(
-            "n/j H:i",
-            strtotime($task["created_at"])
+            "n/j",
+            strtotime(
+                $task["due_date"]
+            )
         );
         ?>
 
+        <?php if (
+            $task["due_date"] < date("Y-m-d")
+        ): ?>
 
-        <span>
-            期限：
+            <span class="overdue-label">
+                期限切れ
+            </span>
 
-            <?php
+        <?php endif; ?>
 
-            if ($task["due_date"] === null) {
+    <?php else: ?>
 
-                echo "なし";
+        期限なし
 
-            } else {
+    <?php endif; ?>
 
-                echo htmlspecialchars(
-                    $task["due_date"]
-                );
-            }
-
-            ?>
-
-        </span>
+</span>
 
 
-        <form
-            method="post"
-            style="display: inline;"
-            onclick="event.stopPropagation();"
-        >
+                        </div>
 
-            <input
-                type="hidden"
-                name="complete_id"
-                value="<?php echo $task["id"]; ?>"
-            >
-
-            <button type="submit">
-                完了
-            </button>
-
-        </form>
-
-    </div>
-
-    <br>
-
-<?php endforeach; ?>
+                    </div>
 
 
+                    <div class="item-right">
 
-<!-- タスク詳細画面 -->
-<div id="task-modal" style="display: none;">
+
+                        <span class="item-date">
+
+                            <?php
+                            echo date(
+                                "n/j H:i",
+                                strtotime(
+                                    $task["created_at"]
+                                )
+                            );
+                            ?>
+
+                        </span>
+
+
+                        <form
+                            method="post"
+                            onclick="event.stopPropagation();"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="complete_id"
+                                value="<?php
+                                    echo $task["id"];
+                                ?>"
+                            >
+
+                            <button
+                                type="submit"
+                                class="small-action complete-action"
+                            >
+                                完了
+                            </button>
+
+                        </form>
+
+
+                    </div>
+
+
+                </div>
+
+
+            <?php endforeach; ?>
+
+
+        </section>
+
+
+    </main>
+
+
+    <?php include "input_form2.php"; ?>
+
+
+</div>
+
+
+<?php include "calendar2.php"; ?>
+
+
+
+<!-- =========================
+     タスク詳細
+========================= -->
+
+<div
+    id="task-modal"
+    class="detail-modal"
+    style="display: none;"
+>
 
 
     <button
         type="button"
+        class="close-button"
         onclick="closeTaskModal()"
     >
         ×
@@ -227,9 +736,10 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <form method="post">
 
+
         <input
             type="hidden"
-            name="edit_id"
+            name="task_edit_id"
             id="modal-edit-id"
         >
 
@@ -246,78 +756,180 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <p>期限</p>
 
         <input
-            type="date"
+            type="text"
             name="due_date"
             id="modal-due-date"
+            readonly
+            onclick="openCalendar(this, { noneText: '期限なし' })"
+        >
+
+
+        <p>ジャンル</p>
+
+        <select
+            name="genre_id"
+            id="modal-genre-id"
+        >
+
+            <option value="">
+                ジャンルなし
+            </option>
+
+
+            <?php foreach ($genres as $genre): ?>
+
+                <option
+                    value="<?php
+                        echo $genre["id"];
+                    ?>"
+                >
+
+                    <?php
+                    echo htmlspecialchars(
+                        $genre["genre_name"]
+                    );
+                    ?>
+
+                </option>
+
+            <?php endforeach; ?>
+
+        </select>
+
+
+        <p>新しいジャンル</p>
+
+        <input
+            type="text"
+            name="new_genre_name"
+            id="modal-new-genre-name"
+            placeholder="新しく作る場合のみ入力"
         >
 
 
         <br><br>
 
 
-        <button type="submit">
+        <button
+            type="submit"
+            class="modal-save-button"
+        >
             保存
         </button>
 
+
     </form>
+
 
 </div>
 
 
 
-<nav>
-    <a href="zen2.php">全情報</a>
-    <a href="memos2.php">メモ</a>
-    <a href="tasks2.php">タスク</a>
-    <a href="kioku2.php">リマインド</a>
-</nav>
-
-
-<?php include "input_form2.php"; ?>
-
-
-
 <script>
+
+
+function toggleSearch() {
+
+    const searchArea =
+        document.getElementById(
+            "search-area"
+        );
+
+
+    const isHidden =
+        window.getComputedStyle(
+            searchArea
+        ).display === "none";
+
+
+    searchArea.style.display =
+        isHidden
+        ? "block"
+        : "none";
+}
+
+
 
 function openTaskModal(task) {
 
     document
-        .getElementById("modal-edit-id")
-        .value = task.dataset.id;
+        .getElementById(
+            "modal-edit-id"
+        )
+        .value =
+            task.dataset.id;
 
 
     document
-        .getElementById("modal-task-text")
-        .textContent = task.dataset.taskText;
+        .getElementById(
+            "modal-task-text"
+        )
+        .textContent =
+            task.dataset.taskText;
 
 
     document
-        .getElementById("modal-created-at")
-        .textContent = task.dataset.createdAt;
+        .getElementById(
+            "modal-created-at"
+        )
+        .textContent =
+            task.dataset.createdAt;
 
 
     document
-        .getElementById("modal-detail-text")
-        .value = task.dataset.detailText;
+        .getElementById(
+            "modal-detail-text"
+        )
+        .value =
+            task.dataset.detailText;
 
 
     document
-        .getElementById("modal-due-date")
-        .value = task.dataset.dueDate;
+        .getElementById(
+            "modal-due-date"
+        )
+        .value =
+            task.dataset.dueDate;
 
 
     document
-        .getElementById("task-modal")
-        .style.display = "block";
+        .getElementById(
+            "modal-genre-id"
+        )
+        .value =
+            task.dataset.genreId;
+
+
+    document
+        .getElementById(
+            "modal-new-genre-name"
+        )
+        .value = "";
+
+
+    document
+        .getElementById(
+            "task-modal"
+        )
+        .style.display =
+            "block";
 }
+
 
 
 function closeTaskModal() {
 
     document
-        .getElementById("task-modal")
-        .style.display = "none";
+        .getElementById(
+            "task-modal"
+        )
+        .style.display =
+            "none";
 }
+
 
 </script>
 
+
+</body>
+</html>
