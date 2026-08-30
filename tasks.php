@@ -1,14 +1,14 @@
 <?php
 
-include "db2.php";
+include "db.php";
 
 
 /* 保存・更新処理 */
-include "genre_update2.php";
+include "genre_update.php";
 
-include "save2.php";
+include "save.php";
 
-include "task_update2.php";
+include "task_update.php";
 
 
 /* =========================
@@ -139,7 +139,7 @@ $genres =
 
     <link
         rel="stylesheet"
-        href="style2.css"
+        href="style.css"
     >
 
 </head>
@@ -171,22 +171,22 @@ $genres =
 
         <nav class="top-tabs">
 
-            <a href="kioku2.php">
+            <a href="index.php">
                 ホーム
             </a>
 
-            <a href="memos2.php">
+            <a href="memos.php">
                 メモ
             </a>
 
             <a
-                href="tasks2.php"
+                href="tasks.php"
                 class="active"
             >
                 タスク
             </a>
 
-            <a href="genre_manage2.php">
+            <a href="genre_manage.php">
                 ジャンル
             </a>
 
@@ -215,7 +215,7 @@ $genres =
 
             <form
                 method="get"
-                action="search2.php"
+                action="search.php"
                 class="search-form"
             >
 
@@ -691,13 +691,13 @@ $genres =
     </main>
 
 
-    <?php include "input_form2.php"; ?>
+    <?php include "input_form.php"; ?>
 
 
 </div>
 
 
-<?php include "calendar2.php"; ?>
+<?php include "calendar.php"; ?>
 
 
 

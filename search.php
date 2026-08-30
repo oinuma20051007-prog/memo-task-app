@@ -7,9 +7,9 @@ include "db2.php";
    共通処理
 ========================= */
 
-include "genre_update2.php";
-include "memo_update2.php";
-include "task_update2.php";
+include "genre_update.php";
+include "memo_update.php";
+include "task_update.php";
 
 
 /* =========================
@@ -453,7 +453,7 @@ $genres =
 
 
             <a
-                href="kioku2.php"
+                href="index.php"
                 <?php
                 if ($type === "all") {
                     echo 'class="active"';

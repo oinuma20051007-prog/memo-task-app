@@ -46,7 +46,7 @@ if (isset($_POST["memo_edit_id"])) {
 
     /*
         新しいジャンル名が入力されていたら
-        genre_update2.php の共通処理で
+        genre_update.php の共通処理で
         genre_id を取得する
     */
     if (

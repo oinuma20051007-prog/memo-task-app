@@ -3,17 +3,17 @@
 session_start();
 
 
-include "db2.php";
+include "db.php";
 
 
 /* =========================
    保存・更新処理
 ========================= */
 
-include "genre_update2.php";
-include "save2.php";
-include "memo_update2.php";
-include "task_update2.php";
+include "genre_update.php";
+include "save.php";
+include "memo_update.php";
+include "task_update.php";
 
 
 /* =========================
@@ -288,7 +288,7 @@ $genres =
 
     <link
         rel="stylesheet"
-        href="style2.css?v=2"
+        href="style.css?v=2"
     >
 
 </head>
@@ -328,24 +328,24 @@ $genres =
 
 
             <a
-                href="kioku2.php"
+                href="index.php"
                 class="active"
             >
                 ホーム
             </a>
 
 
-            <a href="memos2.php">
+            <a href="memos.php">
                 メモ
             </a>
 
 
-            <a href="tasks2.php">
+            <a href="tasks.php">
                 タスク
             </a>
 
 
-            <a href="genre_manage2.php">
+            <a href="genre_manage.php">
                 ジャンル
             </a>
 
@@ -378,7 +378,7 @@ $genres =
 
             <form
                 method="get"
-                action="search2.php"
+                action="search.php"
                 class="search-form"
             >
 
@@ -1322,12 +1322,12 @@ $genres =
 
 
     <?php
-    include "calendar2.php";
+    include "calendar.php";
     ?>
 
 
     <?php
-    include "input_form2.php";
+    include "input_form.php";
     ?>
 
 

@@ -1,6 +1,6 @@
 <?php
 
-include "db2.php";
+include "db.php";
 
 
 /* =========================
@@ -169,7 +169,7 @@ $genres =
 
     <link
         rel="stylesheet"
-        href="style2.css"
+        href="style.css"
     >
 
 </head>
@@ -204,23 +204,23 @@ $genres =
         <nav class="top-tabs">
 
 
-            <a href="kioku2.php">
+            <a href="index.php">
                 ホーム
             </a>
 
 
-            <a href="memos2.php">
+            <a href="memos.php">
                 メモ
             </a>
 
 
-            <a href="tasks2.php">
+            <a href="tasks.php">
                 タスク
             </a>
 
 
             <a
-                href="genre_manage2.php"
+                href="genre_manage.php"
                 class="active"
             >
                 ジャンル
