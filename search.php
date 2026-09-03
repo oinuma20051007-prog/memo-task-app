@@ -1,20 +1,10 @@
 <?php
 
-include "db2.php";
+require_once __DIR__ . "/config/db.php";
 
-
-/* =========================
-   共通処理
-========================= */
-
-include "genre_update.php";
-include "memo_update.php";
-include "task_update.php";
-
-
-/* =========================
-   検索条件を受け取る
-========================= */
+include __DIR__ . "/actions/genre_update.php";
+include __DIR__ . "/actions/memo_update.php";
+include __DIR__ . "/actions/task_update.php";
 
 $type = $_GET["type"] ?? "all";
 
@@ -422,9 +412,9 @@ $genres =
     <title>検索</title>
 
     <link
-        rel="stylesheet"
-        href="style2.css"
-    >
+    rel="stylesheet"
+    href="assets/css/style.css"
+>
 
 </head>
 
@@ -465,7 +455,7 @@ $genres =
 
 
             <a
-                href="memos2.php"
+                href="memos.php"
                 <?php
                 if ($type === "memo") {
                     echo 'class="active"';
@@ -477,7 +467,7 @@ $genres =
 
 
             <a
-                href="tasks2.php"
+                href="tasks.php"
                 <?php
                 if ($type === "task") {
                     echo 'class="active"';
@@ -488,7 +478,7 @@ $genres =
             </a>
 
 
-            <a href="genre_manage2.php">
+            <a href="genre_manage.php">
                 ジャンル
             </a>
 
@@ -519,7 +509,7 @@ $genres =
 
             <form
                 method="get"
-                action="search2.php"
+                action="search.php"
                 class="search-form"
             >
 
@@ -668,11 +658,13 @@ $genres =
             <div class="search-clear-row">
 
 
-                <a
-                    href="search2.php?type=<?php
-                        echo urlencode($type);
-                    ?>"
-                    class="search-clear-link"
+               <a
+    href="search.php?type=<?php
+        echo urlencode($type);
+    ?>"
+    class="search-clear-link"
+>
+                 
                 >
                     条件をクリア
                 </a>
@@ -986,8 +978,7 @@ $genres =
 </div>
 
 
-
-<?php include "calendar2.php"; ?>
+<?php include "calendar.php"; ?>
 
 
 
