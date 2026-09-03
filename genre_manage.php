@@ -1,6 +1,6 @@
 <?php
 
-include "db.php";
+require_once __DIR__ . "/config/db.php";
 
 
 /* =========================
@@ -167,10 +167,10 @@ $genres =
 
     <title>ジャンル</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+ <link
+    rel="stylesheet"
+    href="assets/css/style.css"
+>
 
 </head>
 
