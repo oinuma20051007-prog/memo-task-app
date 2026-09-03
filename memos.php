@@ -1,12 +1,10 @@
 <?php
 
-include "db.php";
+require_once __DIR__ . "/config/db.php";
 
-
-/* 保存・更新処理 */
-include "genre_update.php";
-include "save.php";
-include "memo_update.php";
+include __DIR__ . "/actions/genre_update.php";
+include __DIR__ . "/actions/save.php";
+include __DIR__ . "/actions/memo_update.php";
 
 
 /* =========================
@@ -95,10 +93,10 @@ $genres =
 
     <title>メモ</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+ <link
+    rel="stylesheet"
+    href="assets/css/style.css"
+>
 
 </head>
 
@@ -654,7 +652,7 @@ $genres =
 
     <?php include "calendar.php"; ?>
 
-    <?php include "input_form.php"; ?>
+   <?php include __DIR__ . "/includes/input_form.php"; ?>
 
 
 </div>
