@@ -1,10 +1,14 @@
 <?php
 
-require_once __DIR__ . "/config/db.php";
+include "db.php";
 
-include __DIR__ . "/actions/genre_update.php";
-include __DIR__ . "/actions/save.php";
-include __DIR__ . "/actions/task_update.php";
+
+/* 保存・更新処理 */
+include "genre_update.php";
+
+include "save.php";
+
+include "task_update.php";
 
 
 /* =========================
@@ -133,10 +137,10 @@ $genres =
 
     <title>タスク</title>
 
-  <link
-    rel="stylesheet"
-    href="assets/css/style.css"
-　　>
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
 </head>
 
@@ -686,7 +690,8 @@ $genres =
 
     </main>
 
-<?php include __DIR__ . "/includes/input_form.php"; ?>
+
+    <?php include "input_form.php"; ?>
 
 
 </div>
