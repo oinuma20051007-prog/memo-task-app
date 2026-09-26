@@ -414,7 +414,7 @@ KeepMemo++という名前には、Keepメモのような「気軽に残せる」
 
 ジャンルは管理画面から追加できます。
 
-![ジャンル管理画面](assets/images/genres.png)
+![ジャンル管理画面](assets/images/search.png)
 
 ### 5. 過去の情報を検索
 
@@ -422,7 +422,7 @@ KeepMemo++という名前には、Keepメモのような「気軽に残せる」
 
 複数の条件を組み合わせて絞り込むこともできます。
 
-![検索画面](assets/images/search.png)
+![検索画面](assets/images/genres.png)
 
 ### 6. 過去の情報を再確認
 
